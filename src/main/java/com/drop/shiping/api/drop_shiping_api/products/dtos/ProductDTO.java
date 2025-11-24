@@ -24,7 +24,7 @@ public record ProductDTO(
     String productName,
 
     @NotBlank(message = "{NotBlank.validation.text}")
-    @Size(max = 140, message = "{Size.product.description}")
+    @Size(max = 400, message = "{Size.product.description}")
     String description,
 
     @NotNull(message = "{NotBlank.validation.text}")

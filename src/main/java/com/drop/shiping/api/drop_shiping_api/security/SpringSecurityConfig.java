@@ -52,7 +52,7 @@ public class SpringSecurityConfig {
             .requestMatchers(HttpMethod.GET, "/app/products", "/app/products/{id}").permitAll()
             .requestMatchers(HttpMethod.GET, "/app/users/token-validation").permitAll()
             .requestMatchers(HttpMethod.POST, "/app/users/register").permitAll()
-            .requestMatchers(HttpMethod.GET, "/app/payments/success").permitAll()
+            .requestMatchers(HttpMethod.GET, "/app/payments").permitAll()
             .requestMatchers(HttpMethod.GET, "/app/payments/cancel").permitAll()
             .requestMatchers(HttpMethod.POST, "/app/payments/create-payment-session").permitAll()
             .requestMatchers(HttpMethod.POST, "/app/payments/webhook").permitAll()
