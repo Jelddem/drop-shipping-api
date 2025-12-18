@@ -33,14 +33,11 @@ public class ProductServiceImpl implements ProductService {
     private final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final ProductRepository repository;
     private final ProductCategoryService categoryService;
-    private final VariantService variantService;
     private final ImageService imageService;
 
-    public ProductServiceImpl(ProductRepository repository, ProductCategoryService categoryService, 
-    VariantService variantService, ImageService imageService) {
+    public ProductServiceImpl(ProductRepository repository, ProductCategoryService categoryService, ImageService imageService) {
         this.repository = repository;
         this.categoryService = categoryService;
-        this.variantService = variantService;
         this.imageService = imageService;
     }
 
@@ -74,10 +71,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDTO save(ProductDTO dto) {
-        List<Variant> variants = dto.variants().stream().map(variantDto -> {
-            String listValues = String.join("|", variantDto.listValues());
-            return new Variant(variantDto.name(), variantDto.tag(), listValues, variantDto.type());
-        }).toList();
+        List<Variant> variants = new ArrayList<>();
+        if (dto.variants() != null && !dto.variants().isEmpty()) {
+            variants = dto.variants().stream().map(variantDto -> {
+                String listValues = String.join("|", variantDto.listValues());
+                return new Variant(variantDto.name(), variantDto.tag(), listValues, variantDto.type());
+            }).toList();
+        }
 
         Product product = ProductMapper.MAPPER.productDTOtoProduct(dto, variants);
 

@@ -1,5 +1,6 @@
 package com.drop.shiping.api.drop_shiping_api.payments.controllers;
 
+import com.drop.shiping.api.drop_shiping_api.payments.dtos.EpaycoWebhookDTO;
 import com.drop.shiping.api.drop_shiping_api.payments.services.PaymentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -41,7 +42,7 @@ public class PaymentController {
                 .body(new ParameterizedTypeReference<Map<String, String>>() {});
     }
 
-    @GetMapping("/get-session")
+    @PostMapping("/get-session")
     public String getSession() {
         Map<String, String> body = new HashMap<>();
 
@@ -54,8 +55,6 @@ public class PaymentController {
         body.put("lang", "ES");
         body.put("ip", "201.245.254.45");
         body.put("test", "true");
-        body.put("confirmation", "https://webhook.site/4d6ebe96-4e79-4768-bdee-09b8fde0e6c7");
-        body.put("response", "https://hkdk.events/ha64xsf25bn8lv");
         body.put("methodconfirmation", "POST");
 
         return restClient.post()
@@ -67,21 +66,18 @@ public class PaymentController {
     }
 
     @PostMapping("/confirmation")
-    public ResponseEntity<String> handleWebhook() {
-//        try {
-//            System.out.println("Llega aquí");
-//            if (!paymentService.validateSignature(request))
-//                return ResponseEntity.badRequest().body("Firma invalida");
-//
-//            paymentService.processWebhook(request);
-//
-//            return ResponseEntity.ok().build();
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error procesando webhook");
-//        }
+    public ResponseEntity<String> handleWebhook(@RequestBody EpaycoWebhookDTO request) {
+        try {
+            System.out.println("Llega aquí");
+            if (!paymentService.validateSignature(request))
+                return ResponseEntity.badRequest().body("Firma invalida");
 
-        System.out.println("Funciona");
-        return ResponseEntity.ok().build();
+            paymentService.processWebhook(request);
+
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error procesando webhook");
+        }
     }
 }
