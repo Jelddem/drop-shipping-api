@@ -1,6 +1,7 @@
 package com.drop.shiping.api.drop_shiping_api.payments.controllers;
 
 import com.drop.shiping.api.drop_shiping_api.payments.dtos.EpaycoWebhookDTO;
+import com.drop.shiping.api.drop_shiping_api.payments.dtos.SessionDataDTO;
 import com.drop.shiping.api.drop_shiping_api.payments.services.PaymentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,21 +41,26 @@ public class PaymentController {
     }
 
     @PostMapping("/get-session")
-    public String getSession() {
-        Map<String, String> body = new HashMap<>();
+    public String getSession(@RequestBody SessionDataDTO data) {
+        Map<String, Object> body = new HashMap<>();
 
         body.put("checkout_version", "2");
-        body.put("name", "QA Shops Online S.A.S");
-        body.put("description", "Buzo con capucha color negro unisex");
+        body.put("name", data.name());
+        body.put("description", data.description());
         body.put("currency", "COP");
-        body.put("amount", "20000");
+        body.put("amount",  data.amount());
         body.put("country", "CO");
         body.put("lang", "ES");
         body.put("ip", "201.245.254.45");
-        body.put("test", "true");
+        body.put("method", "POST");
+        body.put("test", true);
+
+        Map<String, Object> extras = new HashMap<>();
+        extras.put("extra1", data.transactionId());
+        body.put("extras", extras);
+
 //        body.put("confirmation", "https://charriest-semiclinically-julienne.ngrok-free.dev/app/payments/confirmation");
         body.put("response", "https://charriest-semiclinically-julienne.ngrok-free.dev/payments/invoice");
-        body.put("methodconfirmation", "POST");
 
         return restClient.post()
                 .uri("/payment/session/create")

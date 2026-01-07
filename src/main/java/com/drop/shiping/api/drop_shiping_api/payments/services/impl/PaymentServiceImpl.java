@@ -2,6 +2,8 @@ package com.drop.shiping.api.drop_shiping_api.payments.services.impl;
 
 import com.drop.shiping.api.drop_shiping_api.payments.dtos.EpaycoWebhookDTO;
 import com.drop.shiping.api.drop_shiping_api.payments.services.PaymentService;
+import com.drop.shiping.api.drop_shiping_api.transactions.entities.Transaction;
+import com.drop.shiping.api.drop_shiping_api.transactions.repositories.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,16 +14,22 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
     private static final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
+    private final TransactionRepository transactionRepository;
 
     @Value("${epayco.customer.id}")
     private String epaycoCustomerId;
 
     @Value("${epayco.key}")
     private String epaycoKey;
+
+    public PaymentServiceImpl(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
 
     @Override
     public boolean validateSignature(EpaycoWebhookDTO request) {
@@ -39,7 +47,6 @@ public class PaymentServiceImpl implements PaymentService {
             byte[] hash = digest.digest(signatureString.getBytes(StandardCharsets.UTF_8));
 
             String calculatedSignature = bytesToHex(hash);
-
             String receivedSignature = request.x_signature().split(",")[0].trim();
 
             return calculatedSignature.equals(receivedSignature);
@@ -71,20 +78,35 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processApprovedTransaction(EpaycoWebhookDTO request) {
-        System.out.println("Información de compra: " + request);
+        String transactionId = request.x_extra1().split(",")[0];
+        transactionRepository.findById(transactionId).ifPresent(transaction -> {
+            transaction.setReference(request.x_ref_payco().split(",")[0]);
+            transactionRepository.save(transaction);
+        });
     }
 
     private void processRejectTransaction(EpaycoWebhookDTO request) {
-        System.out.println("Información de compra: " + request);
+        String transactionId = request.x_extra1().split(",")[0];
+        transactionRepository.findById(transactionId).ifPresent(transaction -> {
+            transaction.setReference(request.x_ref_payco().split(",")[0]);
+            transactionRepository.save(transaction);
+        });
     }
 
     private void processPendingTransaction(EpaycoWebhookDTO request) {
-        System.out.println("Información de compra: " + request);
+        String transactionId = request.x_extra1().split(",")[0];
+        transactionRepository.findById(transactionId).ifPresent(transaction -> {
+            transaction.setReference(request.x_ref_payco().split(",")[0]);
+            transactionRepository.save(transaction);
+        });
     }
 
     private void processFailedTransaction(EpaycoWebhookDTO request) {
-        System.out.println("Información de compra: " + request);
-    }
+        String transactionId = request.x_extra1().split(",")[0];
+        transactionRepository.findById(transactionId).ifPresent(transaction -> {
+            transaction.setReference(request.x_ref_payco().split(",")[0]);
+            transactionRepository.save(transaction);
+        });    }
 
     private String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder();

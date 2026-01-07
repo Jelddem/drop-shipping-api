@@ -1,5 +1,7 @@
 package com.drop.shiping.api.drop_shiping_api.transactions.services;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.drop.shiping.api.drop_shiping_api.transactions.dtos.OrderResponseDTO;
@@ -15,11 +17,11 @@ public interface TransactionService {
 
     Optional<OrderResponseDTO> findOne(String id);
 
-    NewTransactionDTO addProductsInfo(NewTransactionDTO dto);
+    String createTransaction(NewTransactionDTO dto);
 
-    UserInfoDTO addUserInfo(String userId, UserInfoDTO dto);
+    Map<String, String> addUserInfo(String id, UserInfoDTO dto);
 
-    Optional<Transaction> update(String id, UpdateOrderDTO order);
+    String updateProducts(String id, List<String> productIds);
 
     Optional<Transaction> delete(String id);
 }

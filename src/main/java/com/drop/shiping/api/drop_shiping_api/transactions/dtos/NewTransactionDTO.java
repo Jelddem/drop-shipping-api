@@ -9,9 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 public record NewTransactionDTO(
-    String userId,
-    String userReference,
-    String reference,
     Date transactionDate,
 
     @Valid

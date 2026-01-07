@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -46,26 +48,21 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<NewTransactionDTO> addProductsInfo(@Valid @RequestBody NewTransactionDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.addProductsInfo(dto));
+    public ResponseEntity<String> createTransaction(@Valid @RequestBody NewTransactionDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createTransaction(dto));
     }
 
-    @PutMapping("/{identifier}")
-    public ResponseEntity<UserInfoDTO> addUserInfo(
-    @PathVariable("identifier") String identifier,
-    @Valid @RequestBody UserInfoDTO userInfoDTO) {
-        return ResponseEntity.ok().body(service.addUserInfo(identifier, userInfoDTO));
+    @PutMapping("/update-products/{id}")
+    public ResponseEntity<String> updateProducts(
+    @PathVariable("id") String id, @RequestBody List<String> productIds) {
+        return ResponseEntity.ok().body(service.updateProducts(id, productIds));
     }
 
-//    @PutMapping("/{id}")
-//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-//    public ResponseEntity<UpdateOrderDTO> update(@Valid @RequestBody UpdateOrderDTO order,
-//    @PathVariable String id) {
-//        Optional<Transaction> orderDb = service.update(id, order);
-//        orderDb.orElseThrow(() -> new NotFoundException("Order not found"));
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).body(order);
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, String>> addUserInfo(
+    @PathVariable("id") String id, @Valid @RequestBody UserInfoDTO userInfoDTO) {
+        return ResponseEntity.ok().body(service.addUserInfo(id, userInfoDTO));
+    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
