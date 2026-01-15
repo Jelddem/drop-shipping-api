@@ -1,8 +1,7 @@
 package com.drop.shiping.api.drop_shiping_api.transactions.controllers;
 
-import com.drop.shiping.api.drop_shiping_api.transactions.dtos.OrderResponseDTO;
+import com.drop.shiping.api.drop_shiping_api.transactions.dtos.TransactionResponseDTO;
 import com.drop.shiping.api.drop_shiping_api.transactions.dtos.UserInfoDTO;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import com.drop.shiping.api.drop_shiping_api.common.exceptions.NotFoundException;
@@ -35,15 +34,16 @@ public class TransactionController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public Page<OrderResponseDTO> viewAll(@PageableDefault Pageable pageable) {
-        return service.findAll(pageable);
+    public Page<TransactionResponseDTO> viewAllByUser(
+    @RequestHeader(value = "token", required = false) String token,
+    @CookieValue(name = "userReference", required = false) String userRef, @PageableDefault Pageable pageable) {
+        return service.findAllByUser(token, userRef, pageable);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<OrderResponseDTO> view(@PathVariable String id) {
-        Optional<OrderResponseDTO> orderDb = service.findOne(id);
+    public ResponseEntity<TransactionResponseDTO> view(@PathVariable String id) {
+        Optional<TransactionResponseDTO> orderDb = service.findOne(id);
 
         return orderDb.map(order -> ResponseEntity.ok().body(order))
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -63,8 +63,9 @@ public class TransactionController {
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> addUserInfo(
     @CookieValue(value = "userReference", required = false) String userReference,
-    HttpServletResponse response, @PathVariable("id") String id, @Valid @RequestBody UserInfoDTO dto) {
-        return ResponseEntity.ok().body(service.addUserInfo(userReference, response, id, dto));
+    @PathVariable("id") String id, @RequestHeader(value = "token", required = false) String token,
+    @Valid @RequestBody UserInfoDTO dto, HttpServletResponse response) {
+        return ResponseEntity.ok().body(service.addUserInfo(userReference, response, id, dto, token));
     }
 
     @DeleteMapping("/{id}")

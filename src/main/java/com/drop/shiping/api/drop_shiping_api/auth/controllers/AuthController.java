@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.drop.shiping.api.drop_shiping_api.auth.dtos.RegisterUserDTO;
 import com.drop.shiping.api.drop_shiping_api.auth.mappers.AuthMapper;
+import com.drop.shiping.api.drop_shiping_api.auth.services.AuthService;
 import com.drop.shiping.api.drop_shiping_api.common.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,18 +30,18 @@ import static com.drop.shiping.api.drop_shiping_api.security.JwtConfig.*;
 @CrossOrigin(originPatterns = "*")
 public class AuthController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
-    private final UserService service;
-    private final UserRepository repository;
+    private final AuthService service;
+    private final UserService userService;
 
-    public AuthController(UserService service, UserRepository repository) {
+    public AuthController(AuthService service, UserService userService) {
         this.service = service;
-        this.repository = repository;
+        this.userService = userService;
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RegisterUserDTO> create(@Valid @ModelAttribute RegisterUserDTO user) {
-        RegisterUserDTO newUser = service.save(user);
+        RegisterUserDTO newUser = userService.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
@@ -53,19 +54,7 @@ public class AuthController {
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserResponseDTO> getUser(@RequestHeader("Token") String token) {
-        String identifier;
-
-        try {
-            Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
-            identifier = claims.getSubject();
-        } catch(JwtException e) {
-            LOGGER.warn("Invalid JWT token: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-
-        Optional<User> optionalUser = isNumeric(identifier)
-            ? repository.findByPhoneNumber(Long.parseLong(identifier))
-            : repository.findByEmail(identifier);
+        Optional<User> optionalUser = service.getUser(token);
 
         return optionalUser
             .map(AuthMapper.MAPPER::userToUserResponse)
@@ -81,9 +70,5 @@ public class AuthController {
         } catch(JwtException e) {
             return ResponseEntity.badRequest().build();
         }
-    }
-
-    public boolean isNumeric(String str) {
-        return str != null && str.matches("\\d+");
     }
 }

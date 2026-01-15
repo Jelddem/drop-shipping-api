@@ -1,58 +1,62 @@
 package com.drop.shiping.api.drop_shiping_api.transactions.services;
 
+import com.drop.shiping.api.drop_shiping_api.auth.services.AuthService;
 import com.drop.shiping.api.drop_shiping_api.products.entities.Product;
 import com.drop.shiping.api.drop_shiping_api.products.repositories.ProductRepository;
 import com.drop.shiping.api.drop_shiping_api.transactions.dtos.NewTransactionDTO;
-import com.drop.shiping.api.drop_shiping_api.transactions.dtos.OrderResponseDTO;
+import com.drop.shiping.api.drop_shiping_api.transactions.dtos.TransactionResponseDTO;
 import com.drop.shiping.api.drop_shiping_api.transactions.dtos.UserInfoDTO;
 import com.drop.shiping.api.drop_shiping_api.transactions.entities.ProductItem;
 import com.drop.shiping.api.drop_shiping_api.transactions.entities.Transaction;
 import com.drop.shiping.api.drop_shiping_api.transactions.mappers.TransactionMapper;
 import com.drop.shiping.api.drop_shiping_api.users.entities.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.drop.shiping.api.drop_shiping_api.transactions.repositories.TransactionRepository;
-import com.drop.shiping.api.drop_shiping_api.users.repositories.UserRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static com.drop.shiping.api.drop_shiping_api.security.JwtConfig.SECRET_KEY;
-
 @Service
 public class TransactionServiceImpl implements TransactionService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionService.class);
+    private final AuthService  authService;
     private final TransactionRepository repository;
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    public TransactionServiceImpl(TransactionRepository repository, UserRepository userRepository,  ProductRepository productRepository) {
+    public TransactionServiceImpl(AuthService authService, TransactionRepository repository,  ProductRepository productRepository) {
+        this.authService = authService;
         this.repository = repository;
-        this.userRepository = userRepository;
         this.productRepository = productRepository;
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Page<OrderResponseDTO> findAll(Pageable pageable) {
-        Page<Transaction> transactions = repository.findAll(pageable);
-        return transactions.map(TransactionMapper.MAPPER::orderToResponseDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<OrderResponseDTO> findOne(String id) {
+    public Page<TransactionResponseDTO> findAllByUser(String token, String userRef, Pageable pageable) {
+        Optional<User> userOptional = authService.getUser(token);
+        User user = new User();
+
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+            userRef = null;
+        }
+
+        Page<Transaction> transactions = repository
+                .findTransactionsByUser_IdOrUserReference(user.getId(), userRef, pageable);
+        return transactions.map(TransactionMapper.MAPPER::transactionToResponseDTO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TransactionResponseDTO> findOne(String id) {
         Optional<Transaction> transaction = repository.findById(id);
-        return transaction.map(TransactionMapper.MAPPER::orderToResponseDTO);
+        return transaction.map(TransactionMapper.MAPPER::transactionToResponseDTO);
     }
 
     @Override
@@ -81,45 +85,26 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Map<String, String> addUserInfo(String userReference, HttpServletResponse response, String id, UserInfoDTO userDTO) {
+    public Map<String, String> addUserInfo(String userReference, HttpServletResponse response, String id,
+    UserInfoDTO userDTO, String token) {
         Transaction transaction = repository.findById(id).orElseThrow();
-        String identifier = "";
+        Optional<User> userOptional = authService.getUser(token);
 
-        if (userDTO.token() != null && !userDTO.token().isBlank()) {
-            try {
-                Claims claims = Jwts.parser()
-                        .verifyWith(SECRET_KEY)
-                        .build()
-                        .parseSignedClaims(userDTO.token())
-                        .getPayload();
-
-                identifier = claims.getSubject();
-
-            } catch (Exception e) {
-                identifier = "";
-            }
-        }
-
-        if (!identifier.isEmpty()) {
-            Optional<User> userOptional = isNumeric(identifier)
-                    ? userRepository.findByPhoneNumber(Long.parseLong(identifier))
-                    : userRepository.findByEmail(identifier);
-
+        if (userOptional.isPresent())
             userOptional.ifPresent(transaction::setUser);
-        } else {
-            if (userReference != null) {
-                transaction.setUserReference(userReference);
-            } else {
-                String reference = UUID.randomUUID().toString();
-                Cookie cookie = new Cookie("userReference", reference);
-                cookie.setHttpOnly(true);
-                cookie.setSecure(true);
-                cookie.setMaxAge(60 * 60 * 24 * 365);
-                cookie.setPath("/");
-                response.addCookie(cookie);
 
-                transaction.setUserReference(reference);
-            }
+        if (userReference != null && userOptional.isEmpty()) {
+            transaction.setUserReference(userReference);
+        } else if (userReference == null) {
+            String reference = UUID.randomUUID().toString();
+            Cookie cookie = new Cookie("userReference", reference);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setMaxAge(60 * 60 * 24 * 365);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+
+            transaction.setUserReference(reference);
         }
 
         transaction.setUserEmail(userDTO.userEmail());

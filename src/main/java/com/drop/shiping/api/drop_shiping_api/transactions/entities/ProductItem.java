@@ -1,6 +1,7 @@
 package com.drop.shiping.api.drop_shiping_api.transactions.entities;
 
 import com.drop.shiping.api.drop_shiping_api.products.entities.Product;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -17,6 +18,7 @@ public class ProductItem {
     private Transaction transaction;
 
     @ManyToOne
+    @JsonIgnoreProperties({"categories", "variants"})
     private Product product;
     private Integer quantity;
 

@@ -1,7 +1,7 @@
 package com.drop.shiping.api.drop_shiping_api.transactions.mappers;
 
 import com.drop.shiping.api.drop_shiping_api.transactions.dtos.NewTransactionDTO;
-import com.drop.shiping.api.drop_shiping_api.transactions.dtos.OrderResponseDTO;
+import com.drop.shiping.api.drop_shiping_api.transactions.dtos.TransactionResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -14,9 +14,7 @@ import com.drop.shiping.api.drop_shiping_api.transactions.dtos.UpdateOrderDTO;
 public interface TransactionMapper {
     TransactionMapper MAPPER = Mappers.getMapper(TransactionMapper.class);
 
-    NewTransactionDTO transactionToDTO(Transaction transaction);
-
-    OrderResponseDTO orderToResponseDTO(Transaction dto);
+    TransactionResponseDTO transactionToResponseDTO(Transaction dto);
 
     @Mapping(target = "id", ignore = true)
     void toUpdateOrder(UpdateOrderDTO dto, @MappingTarget Transaction order);
