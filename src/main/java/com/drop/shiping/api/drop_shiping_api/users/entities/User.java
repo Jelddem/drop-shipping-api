@@ -1,6 +1,5 @@
 package com.drop.shiping.api.drop_shiping_api.users.entities;
 
-import com.drop.shiping.api.drop_shiping_api.images.entities.Image;
 import com.drop.shiping.api.drop_shiping_api.transactions.entities.Transaction;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -13,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -30,9 +28,6 @@ public class User {
     private String id;
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "profile_image")
-    private Image imageUser;
     private String secondName;
     private String lastnames;
 
@@ -45,7 +40,7 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> orders;
+    private List<Transaction> transactions;
 
     @ManyToMany
     @JoinTable(
@@ -64,7 +59,7 @@ public class User {
 
     public User() {
         this.roles = new ArrayList<> ();
-        this.orders = new ArrayList<> ();
+        this.transactions = new ArrayList<> ();
     }
 
     public String getId() {
@@ -81,14 +76,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Image getImageUser() {
-        return imageUser;
-    }
-
-    public void setImageUser(Image profile_image) {
-        this.imageUser = profile_image;
     }
 
     public String getSecondName() {
@@ -139,18 +126,18 @@ public class User {
         this.password = password;
     }
 
-    public List<Transaction> getOrders() {
-        return orders;
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
-    public void setOrders(List<Transaction> orders) {
-        this.orders = orders;
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
-    public void addOrder(List<Transaction> order) {
+    public void addTransaction(List<Transaction> order) {
         order.forEach(ord -> {
             ord.setUser(this);
-            orders.add(ord);
+            transactions.add(ord);
         });
     }
 

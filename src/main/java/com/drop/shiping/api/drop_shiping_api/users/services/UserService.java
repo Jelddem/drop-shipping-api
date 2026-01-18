@@ -27,8 +27,6 @@ public interface UserService {
 
     Optional<User> updatePassword(String id, PasswordDTO passwordInfo);
 
-    User updateProfileImage(String id, MultipartFile file);
-
     Optional<User> delete(String id);
 
     Long usersSize();

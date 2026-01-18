@@ -29,7 +29,6 @@ import static com.drop.shiping.api.drop_shiping_api.security.JwtConfig.*;
 @RequestMapping("/app/users")
 @CrossOrigin(originPatterns = "*")
 public class AuthController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
     private final AuthService service;
     private final UserService userService;
 
@@ -40,7 +39,7 @@ public class AuthController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RegisterUserDTO> create(@Valid @ModelAttribute RegisterUserDTO user) {
+    public ResponseEntity<RegisterUserDTO> create(@Valid @RequestBody RegisterUserDTO user) {
         RegisterUserDTO newUser = userService.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }

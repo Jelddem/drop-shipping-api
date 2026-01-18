@@ -20,16 +20,8 @@ public record RegisterUserDTO(
     @NotBlank(message = "{NotBlank.validation.text}")
     String name,
 
-    @JsonIgnoreProperties("id")
-    Image imageUser,
     String secondName,
     String lastnames,
-
-    @Transient
-    @NotEmptyFile
-    @ImageFormat(maxSize = 1024 * 1024)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    MultipartFile profileImage,
 
     @IfExists(message = "{IfExists.validation}", field = "phoneNumber", entity = "User")
     Long phoneNumber,

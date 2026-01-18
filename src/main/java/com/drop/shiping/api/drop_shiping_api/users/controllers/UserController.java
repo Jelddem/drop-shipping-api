@@ -80,16 +80,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update/profile-image/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Image> updateProfileImage(@PathVariable String id, @RequestPart MultipartFile file) {
-        User user = service.updateProfileImage(id, file);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user.getImageUser());
-    }
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         Optional<User> optionalUser = service.delete(id);
         optionalUser.orElseThrow(() -> new NotFoundException("User not found"));
 

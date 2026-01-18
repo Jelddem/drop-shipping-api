@@ -76,12 +76,6 @@ public class UserServiceImpl implements UserService {
     public RegisterUserDTO save(RegisterUserDTO userDTO) {
         User user = UserMapper.MAPPER.registerDTOtoUser(userDTO);
 
-        MultipartFile file = userDTO.profileImage();
-        if (file != null && !file.isEmpty()) {
-            Image image = uploadProfileImage(file);
-            user.setImageUser(image);
-        }
-
         List<Role> roles = new ArrayList<>();
         roleRepository.findByRole("ROLE_USER").ifPresent(roles::add);
 
@@ -134,25 +128,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User updateProfileImage(String id, MultipartFile file) {
-        User user = repository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
-
-        if (user.getImageUser() != null)
-            deleteProfileImage(user);
-        
-        Image image = uploadProfileImage(file);        
-        user.setImageUser(image);
-
-        return repository.save(user);
-    }
-
-    @Override
-    @Transactional
     public Optional<User> delete(String id) {
         return repository.findById(id).map(user -> {
-            if (user.getImageUser() != null)
-                deleteProfileImage(user);
-
             repository.delete(user);
             return user;
         });
@@ -198,27 +175,5 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Long usersSize() {
         return repository.count();
-    }
-
-    public Image uploadProfileImage(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            LOGGER.warn("File is null or empty");
-            return null;
-        }
-
-        try {
-            return imageService.uploadImage(file);
-        } catch (IOException e) {
-            LOGGER.error("Exception to try upload image: {}", String.valueOf(e));
-            return null;
-        }
-    }
-
-    public void deleteProfileImage(User user) {
-        try {
-            imageService.deleteImage(user.getImageUser());
-        } catch(IOException e) {
-            LOGGER.error("Exception to try delete the image: {}", String.valueOf(e));
-        }
     }
 }

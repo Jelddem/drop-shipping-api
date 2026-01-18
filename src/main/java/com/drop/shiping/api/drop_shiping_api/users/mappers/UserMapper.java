@@ -15,15 +15,14 @@ public interface UserMapper {
     UserMapper MAPPER = Mappers.getMapper(UserMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "enabled", ignore = true)
     User registerDTOtoUser(RegisterUserDTO dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "enabled", ignore = true)
-    @Mapping(target = "imageUser", ignore = true)
     @Mapping(target = "password", ignore = true)
     void toUpdateUser(UserDTO dto, @MappingTarget User user);
 
