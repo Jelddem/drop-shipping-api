@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.drop.shiping.api.drop_shiping_api.transactions.entities.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
-    Page<Transaction> findTransactionsByUser_IdOrUserReference(String userId, String userReference, Pageable pageable);
+    Page<Transaction> findByUser_Id(String userId, Pageable pageable);
+    Page<Transaction> findByUserReference(String userReference, Pageable pageable);
 }

@@ -40,15 +40,17 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public Page<TransactionResponseDTO> findAllByUser(String token, String userRef, Pageable pageable) {
         Optional<User> userOptional = authService.getUser(token);
-        User user = new User();
+        Page<Transaction> transactions;
 
         if (userOptional.isPresent()) {
-            user = userOptional.get();
-            userRef = null;
+            User user = userOptional.get();
+            transactions = repository.findByUser_Id(user.getId(), pageable);
+        } else if (userRef != null && !userRef.isBlank()) {
+            transactions = repository.findByUserReference(userRef, pageable);
+        } else {
+            return Page.empty(pageable);
         }
 
-        Page<Transaction> transactions = repository
-                .findTransactionsByUser_IdOrUserReference(user.getId(), userRef, pageable);
         return transactions.map(TransactionMapper.MAPPER::transactionToResponseDTO);
     }
 
