@@ -59,7 +59,7 @@ public class ProductCategoryController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductCategoryDTO> update(@Valid @RequestBody ProductCategoryDTO categoryDTO,
-    @PathVariable String id) {
+    @PathVariable("id") String id) {
         Optional<ProductCategoryDTO> categoryDb = service.update(id, categoryDTO);
         ProductCategoryDTO category = categoryDb.orElseThrow(() -> new NotFoundException("Category not found"));
 
@@ -68,7 +68,7 @@ public class ProductCategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         Optional<ProductCategory> categoryDb = service.delete(id);
         categoryDb.orElseThrow(() -> new NotFoundException("Category not found"));
 

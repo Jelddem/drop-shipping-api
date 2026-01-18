@@ -43,13 +43,13 @@ public class UserController {
 
     @GetMapping("/by-role")
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<UserResponseDTO> viewByRole(@PageableDefault Pageable pageable, @RequestParam boolean isAdmin) {
+    public Page<UserResponseDTO> viewByRole(@PageableDefault Pageable pageable, @RequestParam("isAdmin") boolean isAdmin) {
         return service.findByRole(pageable, isAdmin);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponseDTO> view(@PathVariable String id) {
+    public ResponseEntity<UserResponseDTO> view(@PathVariable("id") String id) {
         Optional<UserResponseDTO> opProduct = service.findOne(id);
 
         return opProduct.map(product -> ResponseEntity.ok().body(product))
@@ -58,7 +58,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> update(@PathVariable String id, @Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> update(@PathVariable("id") String id, @Valid @RequestBody UserDTO userDTO) {
         Optional<UserDTO> userOptional = service.update(id, userDTO);
         UserDTO user = userOptional.orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -67,7 +67,7 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO, @PathVariable String id) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable("id") String id, @Valid @RequestBody UserDTO userDTO) {
         UserDTO user = UserMapper.MAPPER.userDTOtoOrAdmin(userDTO, false);
         return update(id, user);
     }
