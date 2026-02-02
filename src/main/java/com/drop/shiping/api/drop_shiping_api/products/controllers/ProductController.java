@@ -69,10 +69,10 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/query")
-    public Page<ProductResponseDTO> findByName(
-    @PageableDefault Pageable pageable, @RequestParam(value = "name", required = false) String name,
+    @GetMapping("/search")
+    public Page<ProductResponseDTO> searchProducts(
+    @PageableDefault Pageable pageable, @RequestParam(value = "query", required = false) String query,
     @RequestParam(value = "categories", required = false) List<String> categories) {
-        return service.search(name, categories, pageable);
+        return service.search(query, categories, pageable);
     }
 }

@@ -129,8 +129,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Page<ProductResponseDTO> search(String name, List<String> categories, Pageable pageable) {
-        Page<Product> products = repository.findByProductNameOrCategories(name, categories, pageable);
+    public Page<ProductResponseDTO> search(String query, List<String> categories, Pageable pageable) {
+        Page<Product> products = repository.findByProductNameOrCategories(query, categories, pageable);
 
         return products.map(product -> {
             List<VariantDTO> variants = product.getVariants().stream().map(variant -> {
