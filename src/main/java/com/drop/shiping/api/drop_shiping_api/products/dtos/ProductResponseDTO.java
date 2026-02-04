@@ -6,6 +6,7 @@ import com.drop.shiping.api.drop_shiping_api.images.entities.Image;
 import com.drop.shiping.api.drop_shiping_api.products.entities.ProductCategory;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record ProductResponseDTO(
@@ -22,10 +23,12 @@ public record ProductResponseDTO(
 
     List<VariantDTO> variants,
 
+    LocalDateTime createdAt,
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     List<MultipartFile> images,
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     List<String> categoriesList
-) {
-}
+
+) {}

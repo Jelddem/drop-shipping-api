@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,9 @@ public class Product {
         inverseJoinColumns = @JoinColumn(name = "id_category"),
         uniqueConstraints = @UniqueConstraint(columnNames = {"id_product", "id_category"}))
     private List<ProductCategory> categories;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime  createdAt;
 
     public Product() {
         productImages = new ArrayList<>();
@@ -116,6 +120,10 @@ public class Product {
 
     public void setVariants(List<Variant> variants) {
         this.variants = variants;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     @Override

@@ -18,4 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
         AND (?2 IS NULL OR c.categoryName IN ?2)
     """)
     Page<Product> findByProductNameOrCategories(String query, List<String> categories, Pageable pageable);
+
+    List<Product> findTop5ByOrderByCreatedAtDesc();
 }

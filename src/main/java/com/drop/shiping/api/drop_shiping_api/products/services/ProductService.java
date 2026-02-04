@@ -24,4 +24,6 @@ public interface ProductService {
     Page<ProductResponseDTO> search(String query, List<String> category, Pageable pageable);
 
     Long productsSize();
+
+    List<ProductResponseDTO> latestProducts();
 }

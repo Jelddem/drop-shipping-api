@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<ProductResponseDTO> viewAll(@PageableDefault Pageable pageable) {
+    public Page<ProductResponseDTO> viewAll(
+    @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return service.findAll(pageable);
     }
 
@@ -74,5 +76,10 @@ public class ProductController {
     @PageableDefault Pageable pageable, @RequestParam(value = "query", required = false) String query,
     @RequestParam(value = "categories", required = false) List<String> categories) {
         return service.search(query, categories, pageable);
+    }
+
+    @GetMapping("/latest-products")
+    public List<ProductResponseDTO> findLastCreated() {
+        return service.latestProducts();
     }
 }

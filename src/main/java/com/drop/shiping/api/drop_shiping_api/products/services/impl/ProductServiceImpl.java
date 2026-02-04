@@ -51,7 +51,6 @@ public class ProductServiceImpl implements ProductService {
 
             return ProductMapper.MAPPER.productToResponseDTO(product, variants);
         });
-
     }
 
     @Override
@@ -145,6 +144,19 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Long productsSize() {
         return repository.count();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponseDTO> latestProducts() {
+        return repository.findTop5ByOrderByCreatedAtDesc().stream().map(product -> {
+            List<VariantDTO> variants = product.getVariants().stream().map(var -> {
+                List<String> values = List.of(var.getValues().split("\\|"));
+                return new VariantDTO(var.getId(), var.getName(), var.getType(), var.getTag(), values);
+            }).toList();
+
+            return ProductMapper.MAPPER.productToResponseDTO(product, variants);
+        }).toList();
     }
 
     public List<Image> updateImages(List<Image> currentImages, List<MultipartFile> files, List<String> removeImageIds) {
