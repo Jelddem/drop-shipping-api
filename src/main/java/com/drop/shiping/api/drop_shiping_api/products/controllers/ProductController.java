@@ -79,6 +79,7 @@ public class ProductController {
     }
 
     @GetMapping("/latest-products")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<ProductResponseDTO> findLastCreated() {
         return service.latestProducts();
     }

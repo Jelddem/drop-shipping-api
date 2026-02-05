@@ -174,4 +174,11 @@ public class UserServiceImpl implements UserService {
     public Long usersSize() {
         return repository.count();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> latestUsers() {
+        return repository.findTop4ByOrderByCreatedAtDesc().stream()
+            .map(UserMapper.MAPPER::userToResponseDTO).toList();
+    }
 }

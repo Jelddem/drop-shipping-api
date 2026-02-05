@@ -99,4 +99,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public Long categoriesSize() {
         return repository.count();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductCategoryDTO> latestCategories(){
+        return repository.findTop3ByOrderByCreatedAtDesc().stream()
+            .map(ProductCategoryMapper.mapper::categoryDTOtoCategory).toList();
+    }
 }

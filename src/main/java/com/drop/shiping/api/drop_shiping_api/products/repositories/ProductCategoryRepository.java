@@ -6,4 +6,5 @@ import com.drop.shiping.api.drop_shiping_api.products.entities.ProductCategory;
 
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, String> {
     List<ProductCategory> findByCategoryNameIn(List<String> categories);
+    List<ProductCategory> findTop3ByOrderByCreatedAtDesc();
 }

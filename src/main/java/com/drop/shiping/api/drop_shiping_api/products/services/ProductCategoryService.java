@@ -23,4 +23,6 @@ public interface ProductCategoryService {
     List<ProductCategory> findCategoriesByName(List<String> categoryNames);
 
     Long categoriesSize();
+
+    List<ProductCategoryDTO> latestCategories();
 }
