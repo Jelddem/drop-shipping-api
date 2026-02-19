@@ -34,7 +34,7 @@ public class ProductController {
 
     @GetMapping
     public Page<ProductResponseDTO> viewAll(
-    @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    @PageableDefault(sort = "productName", direction = Sort.Direction.ASC) Pageable pageable) {
         return service.findAll(pageable);
     }
 

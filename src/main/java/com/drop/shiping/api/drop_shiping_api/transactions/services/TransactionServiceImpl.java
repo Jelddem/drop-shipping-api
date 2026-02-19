@@ -56,6 +56,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<TransactionResponseDTO> findAll(Pageable pageable) {
+        Page<Transaction> transactions = repository.findAll(pageable);
+        return transactions.map(TransactionMapper.MAPPER::transactionToResponseDTO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<TransactionResponseDTO> findOne(String id) {
         Optional<Transaction> transaction = repository.findById(id);
         return transaction.map(TransactionMapper.MAPPER::transactionToResponseDTO);

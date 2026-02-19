@@ -37,14 +37,15 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<UserResponseDTO> viewAll(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<UserResponseDTO> viewAll(
+    @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return service.findAll(pageable);
     }
 
     @GetMapping("/by-role")
     @PreAuthorize("hasRole('ADMIN')")
     public Page<UserResponseDTO> viewByRole(
-    @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+    @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
     @RequestParam("isAdmin") boolean isAdmin) {
         return service.findByRole(pageable, isAdmin);
     }

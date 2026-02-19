@@ -41,7 +41,7 @@ public class ProductCategoryController {
 
     @GetMapping
     public Page<CategoryResponseDTO> viewAll(
-    @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    @PageableDefault(sort = "categoryName", direction = Sort.Direction.ASC) Pageable pageable) {
         return service.findAll(pageable);
     }
 

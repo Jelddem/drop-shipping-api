@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 public interface TransactionService {
     Page<TransactionResponseDTO> findAllByUser(String userRef, String userId, Pageable pageable);
 
+    Page<TransactionResponseDTO> findAll(Pageable pageable);
+
     Optional<TransactionResponseDTO> findOne(String id);
 
     String createTransaction(NewTransactionDTO dto);

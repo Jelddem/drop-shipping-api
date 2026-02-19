@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import com.drop.shiping.api.drop_shiping_api.transactions.entities.Transaction;
 import com.drop.shiping.api.drop_shiping_api.transactions.dtos.NewTransactionDTO;
 import com.drop.shiping.api.drop_shiping_api.transactions.services.TransactionService;
+import com.drop.shiping.api.drop_shiping_api.transactions.dtos.ItemResponseDTO;
+import com.drop.shiping.api.drop_shiping_api.products.dtos.ProductResponseDTO;
+import com.drop.shiping.api.drop_shiping_api.images.entities.Image;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +41,12 @@ public class TransactionController {
     @RequestHeader(value = "token", required = false) String token,
     @CookieValue(name = "userReference", required = false) String userRef, @PageableDefault Pageable pageable) {
         return service.findAllByUser(token, userRef, pageable);
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<TransactionResponseDTO> viewAll(@PageableDefault Pageable pageable) {
+        return service.findAll(pageable).map(this::keepOnlyFirstImage);
     }
 
     @GetMapping("/{id}")
@@ -74,5 +83,41 @@ public class TransactionController {
         transactionDb.orElseThrow(() -> new NotFoundException("Transaction not found"));
 
         return ResponseEntity.ok().build();
+    }
+
+    private TransactionResponseDTO keepOnlyFirstImage(TransactionResponseDTO transaction) {
+        if (transaction.products() == null)
+            return transaction;
+
+        List<ItemResponseDTO> newProducts = transaction.products().stream().map(item -> {
+            ProductResponseDTO p = item.product();
+            if (p != null && p.productImages() != null && !p.productImages().isEmpty()) {
+                Image firstImage = p.productImages().get(0);
+
+                ProductResponseDTO newP = new ProductResponseDTO(
+                        p.id(),
+                        p.productName(),
+                        p.description(),
+                        p.price(),
+                        null,
+                        p.categories(),
+                        p.variants(),
+                        p.images(),
+                        p.categoriesList(),
+                        firstImage
+                );
+                return new ItemResponseDTO(item.quantity(), newP);
+            }
+            return item;
+        }).toList();
+
+        return new TransactionResponseDTO(
+                transaction.id(),
+                transaction.reference(),
+                transaction.status(),
+                transaction.transactionDate(),
+                transaction.totalPrice(),
+                newProducts
+        );
     }
 }

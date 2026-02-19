@@ -1,6 +1,7 @@
 package com.drop.shiping.api.drop_shiping_api.products.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.drop.shiping.api.drop_shiping_api.images.entities.Image;
 import com.drop.shiping.api.drop_shiping_api.products.entities.ProductCategory;
@@ -15,6 +16,7 @@ public record ProductResponseDTO(
     String description,
     Long price,
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonIgnoreProperties("id")
     List<Image> productImages,
 
@@ -27,6 +29,9 @@ public record ProductResponseDTO(
     List<MultipartFile> images,
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    List<String> categoriesList
+    List<String> categoriesList,
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Image image
 
 ) {}

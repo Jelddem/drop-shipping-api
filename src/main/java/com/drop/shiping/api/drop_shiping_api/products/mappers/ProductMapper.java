@@ -32,5 +32,6 @@ public interface ProductMapper {
 
     @Mapping(target = "categoriesList", ignore = true)
     @Mapping(target = "variants", expression = "java(variants)")
+    @Mapping(target = "image", ignore = true)
     ProductResponseDTO productToResponseDTO(Product product, List<VariantDTO> variants);
 }
